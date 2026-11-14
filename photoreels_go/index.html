@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PhotoReelsGo</title>
+  <link rel="stylesheet" href="../shared/css/base.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="panel">
+    <header class="brand">
+      <h1>PhotoReelsGo</h1>
+      <p>Reels verticales a partir de tus fotos</p>
+    </header>
+
+    <div class="controls">
+      <details class="section" open>
+        <summary>Ritmo</summary>
+        <div class="segmented">
+          <label><input type="radio" name="pacing" value="constant" data-bind="s.pacing.mode"><span>Fijo</span></label>
+          <label><input type="radio" name="pacing" value="bpm" data-bind="s.pacing.mode"><span>BPM</span></label>
+          <label><input type="radio" name="pacing" value="ramp" data-bind="s.pacing.mode"><span>Rampa</span></label>
+          <label><input type="radio" name="pacing" value="pattern" data-bind="s.pacing.mode"><span>Patrón</span></label>
+        </div>
+
+        <div class="stack" data-show="s.pacing.mode=constant">
+          <label class="field"><span>Duración por foto</span><output data-out="s.pacing.seconds" data-unit=" s"></output>
+            <input type="range" min="0.1" max="4" step="0.05" data-bind="s.pacing.seconds"></label>
+          <div class="chips" aria-label="Duraciones habituales">
+            <button type="button" data-set="s.pacing.seconds" data-value="0.2">0,2</button>
+            <button type="button" data-set="s.pacing.seconds" data-value="0.3">0,3</button>
+            <button type="button" data-set="s.pacing.seconds" data-value="0.5">0,5</button>
+            <button type="button" data-set="s.pacing.seconds" data-value="0.8">0,8</button>
+            <button type="button" data-set="s.pacing.seconds" data-value="1">1</button>
+            <button type="button" data-set="s.pacing.seconds" data-value="1.5">1,5</button>
+          </div>
+        </div>
+
+        <div class="stack" data-show="s.pacing.mode=bpm">
+          <label class="field"><span>Tempo de la canción</span><output data-out="s.pacing.bpm" data-unit=" BPM"></output>
+            <input type="range" min="40" max="220" step="1" data-bind="s.pacing.bpm"></label>
+          <fieldset class="group">
+            <legend>Tiempos por foto</legend>
+            <div class="segmented">
+              <label><input type="radio" name="beats" value="0.5" data-bind="s.pacing.beats" data-type="number"><span>½</span></label>
+              <label><input type="radio" name="beats" value="1" data-bind="s.pacing.beats" data-type="number"><span>1</span></label>
+              <label><input type="radio" name="beats" value="2" data-bind="s.pacing.beats" data-type="number"><span>2</span></label>
+              <label><input type="radio" name="beats" value="4" data-bind="s.pacing.beats" data-type="number"><span>4</span></label>
+            </div>
+          </fieldset>
+          <p class="note">Los cortes caen en el tiempo de la canción que pondrás en el editor. Empieza el audio en el fotograma 0.</p>
+        </div>
+
+        <div class="stack" data-show="s.pacing.mode=ramp">
+          <label class="field"><span>Primera foto</span><output data-out="s.pacing.from" data-unit=" s"></output>
+            <input type="range" min="0.1" max="4" step="0.05" data-bind="s.pacing.from"></label>
+          <label class="field"><span>Última foto</span><output data-out="s.pacing.to" data-unit=" s"></output>
+            <input type="range" min="0.1" max="4" step="0.05" data-bind="s.pacing.to"></label>
+          <p class="note">De 1 s a 0,2 s acelera; al revés, frena.</p>
+        </div>
+
+        <div class="stack" data-show="s.pacing.mode=pattern">
+          <label class="field"><span>Segundos que se repiten</span>
+            <input type="text" class="wide" data-bind="s.pacing.pattern" placeholder="0.8 0.3 0.3 0.8" spellcheck="false"></label>
+          <p class="note">Separa los valores con espacios. Al acabar el patrón vuelve a empezar.</p>
+        </div>
+      </details>
+
+      <details class="section" open>
+        <summary>Encuadre</summary>
+        <div class="segmented two">
+          <label><input type="radio" name="framing" value="paspartu" data-bind="s.framing.mode"><span>Paspartú</span></label>
+          <label><input type="radio" name="framing" value="fill" data-bind="s.framing.mode"><span>Pantalla completa</span></label>
+        </div>
+
+        <div class="stack" data-show="s.framing.mode=paspartu">
+          <label class="field"><span>Margen mínimo</span><output data-out="s.framing.marginPct" data-unit=" %"></output>
+            <input type="range" min="0" max="20" step="0.5" data-bind="s.framing.marginPct"></label>
+          <fieldset class="group">
+            <legend>Fondo</legend>
+            <div class="segmented two">
+              <label><input type="radio" name="background" value="color" data-bind="s.framing.background"><span>Color</span></label>
+              <label><input type="radio" name="background" value="blur" data-bind="s.framing.background"><span>Foto desenfocada</span></label>
+            </div>
+          </fieldset>
+          <div class="swatches" data-show="s.framing.background=color">
+            <label title="Negro"><input type="radio" name="color" value="#101010" data-bind="s.framing.color" aria-label="Negro"><span style="background:#101010"></span></label>
+            <label title="Blanco"><input type="radio" name="color" value="#ffffff" data-bind="s.framing.color" aria-label="Blanco"><span style="background:#ffffff"></span></label>
+            <label title="Papel"><input type="radio" name="color" value="#f3eee4" data-bind="s.framing.color" aria-label="Papel"><span style="background:#f3eee4"></span></label>
+            <label title="Gris"><input type="radio" name="color" value="#8c8b87" data-bind="s.framing.color" aria-label="Gris"><span style="background:#8c8b87"></span></label>
+            <input type="color" id="custom-color" data-bind="s.framing.color" title="Color personalizado" aria-label="Color personalizado">
+          </div>
+          <label class="field" data-show="s.framing.background=blur"><span>Desenfoque</span><output data-out="s.framing.blur" data-unit=" px"></output>
+            <input type="range" min="10" max="120" step="5" data-bind="s.framing.blur"></label>
+          <label class="field"><span>Borde de la foto</span><output data-out="s.framing.borderWidth" data-unit=" px"></output>
+            <input type="range" min="0" max="30" step="1" data-bind="s.framing.borderWidth"></label>
+          <label class="field inline" data-show="s.framing.borderWidth!=0"><span>Color del borde</span>
+            <input type="color" data-bind="s.framing.borderColor"></label>
+        </div>
+
+        <p class="note" data-show="s.framing.mode=fill">Llena el 9:16 recortando la foto. Haz clic en cada miniatura para elegir qué parte se conserva.</p>
+      </details>
+
+      <details class="section">
+        <summary>Movimiento</summary>
+        <label class="check"><input type="checkbox" data-bind="s.motion.enabled"><span>Zoom o paneo suave<small>Solo en fotos de 0,8 s o más; en las cortas se vería como un temblor</small></span></label>
+        <label class="field inline"><span>Dirección</span>
+          <select data-bind="s.motion.direction">
+            <option value="alternate">Alternar acercar y alejar</option>
+            <option value="zoom-in">Acercar</option>
+            <option value="zoom-out">Alejar</option>
+            <option value="pan-right">Paneo a la derecha</option>
+            <option value="pan-left">Paneo a la izquierda</option>
+            <option value="pan-down">Paneo hacia abajo</option>
+            <option value="pan-up">Paneo hacia arriba</option>
+          </select>
+        </label>
+        <label class="field"><span>Intensidad</span><output data-out="s.motion.zoomPct" data-unit=" %"></output>
+          <input type="range" min="1" max="15" step="1" data-bind="s.motion.zoomPct"></label>
+      </details>
+
+      <details class="section" open>
+        <summary>Exportación</summary>
+        <fieldset class="group">
+          <legend>Formato</legend>
+          <div class="segmented three">
+            <label><input type="radio" name="out-format" value="png" data-bind="s.output.format"><span>PNG</span></label>
+            <label><input type="radio" name="out-format" value="jpeg" data-bind="s.output.format"><span>JPEG</span></label>
+            <label><input type="radio" name="out-format" value="mp4" data-bind="s.output.format"><span>MP4</span></label>
+          </div>
+          <p class="note" data-show="s.output.format=png">Secuencia sin pérdida para DaVinci Resolve. La versión gratuita en Linux no abre H.264.</p>
+          <p class="note" data-show="s.output.format=jpeg">Secuencia al 95 %: ocupa mucho menos que PNG y casi no se distingue.</p>
+          <p class="note" data-show="s.output.format=mp4">H.264 para subir directamente a Instagram, o para editores que lo abren (Kdenlive, Shotcut, DaVinci Studio).</p>
+        </fieldset>
+        <fieldset class="group">
+          <legend>Resolución</legend>
+          <div class="segmented two">
+            <label><input type="radio" name="resolution" value="fhd" data-bind="s.output.resolution"><span>1080×1920</span></label>
+            <label><input type="radio" name="resolution" value="uhd" data-bind="s.output.resolution"><span>4K vertical</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="group">
+          <legend>Fotogramas por segundo</legend>
+          <div class="segmented three">
+            <label><input type="radio" name="fps" value="24" data-bind="s.output.fps" data-type="number"><span>24</span></label>
+            <label><input type="radio" name="fps" value="30" data-bind="s.output.fps" data-type="number"><span>30</span></label>
+            <label><input type="radio" name="fps" value="60" data-bind="s.output.fps" data-type="number"><span>60</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="group" data-show="s.output.format=mp4">
+          <legend>Bitrate</legend>
+          <div class="segmented">
+            <label><input type="radio" name="mbps" value="12" data-bind="s.output.mbps" data-type="number"><span>12</span></label>
+            <label><input type="radio" name="mbps" value="25" data-bind="s.output.mbps" data-type="number"><span>25</span></label>
+            <label><input type="radio" name="mbps" value="40" data-bind="s.output.mbps" data-type="number"><span>40</span></label>
+            <label><input type="radio" name="mbps" value="80" data-bind="s.output.mbps" data-type="number"><span>80</span></label>
+          </div>
+          <p class="note">Mbit/s. Instagram recomprime; 25 basta para 1080×1920.</p>
+        </fieldset>
+      </details>
+
+      <details class="section">
+        <summary>Zonas seguras</summary>
+        <label class="check"><input type="checkbox" data-bind="ui.zones"><span>Mostrar guías de Reels<small>Solo en la vista previa; no se exportan</small></span></label>
+      </details>
+    </div>
+
+    <div class="actions">
+      <p class="note" id="total-note"></p>
+      <p class="note warn" id="flash-note" hidden></p>
+      <p class="note warn" id="length-note" hidden></p>
+      <p class="note warn" id="res-note" hidden></p>
+      <p class="note" id="target-note" hidden></p>
+      <button type="button" class="primary" id="export" disabled>Exportar</button>
+      <button type="button" class="ghost" id="cancel" hidden>Cancelar</button>
+      <button type="button" class="ghost" id="clear" hidden>Vaciar</button>
+    </div>
+  </aside>
+
+  <main class="stage" id="stage">
+    <button type="button" class="dropzone" id="dropzone">
+      <strong>Arrastra aquí tus fotos</strong>
+      <span>o haz clic para elegirlas · JPG, PNG o WebP · se ordenan por fecha de captura</span>
+    </button>
+
+    <div class="workspace" id="workspace" hidden>
+      <section class="player" aria-label="Vista previa">
+        <canvas id="preview" role="img" aria-label="Vista previa del reel"></canvas>
+        <div class="transport">
+          <button type="button" class="ghost small" id="play" aria-label="Reproducir">▶</button>
+          <input type="range" id="scrub" min="0" max="0" value="0" aria-label="Posición">
+          <span id="time" class="time"></span>
+        </div>
+      </section>
+
+      <section class="clips-area">
+        <div class="toolbar">
+          <span id="summary"></span>
+          <span class="order">
+            <span>Ordenar:</span>
+            <button type="button" class="ghost small" data-order="date">Fecha</button>
+            <button type="button" class="ghost small" data-order="name">Nombre</button>
+            <button type="button" class="ghost small" data-order="random">Aleatorio</button>
+            <button type="button" class="ghost small" id="add-more">Añadir fotos</button>
+          </span>
+        </div>
+        <ol class="clips" id="clips"></ol>
+      </section>
+    </div>
+  </main>
+
+  <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple hidden>
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="../shared/js/random.js"></script>
+  <script src="../shared/js/layout.js"></script>
+  <script src="../shared/js/exif.js"></script>
+  <script src="../shared/js/safezones.js"></script>
+  <script src="../shared/js/zip.js"></script>
+  <script src="../shared/js/dom.js"></script>
+  <script src="js/kenburns.js"></script>
+  <script src="js/mp4.js"></script>
+  <script src="js/codec.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/framing.js"></script>
+  <script src="js/order.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

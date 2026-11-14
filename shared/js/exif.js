@@ -1,4 +1,5 @@
-// Lector mínimo de EXIF para JPEG. Sin DOM. Solo extrae los campos del pie de foto.
+// Lector mínimo de EXIF para JPEG. Sin DOM. Extrae los campos del pie de foto y
+// la fecha de captura.
 (function (root) {
   const TAGS = {
     IFD0: { 0x010f: 'make', 0x0110: 'model', 0x8769: 'exifPointer' },
@@ -8,6 +9,8 @@
       0x8827: 'iso',
       0x920a: 'focal',
       0xa434: 'lens',
+      0x9003: 'dateTimeOriginal',
+      0x9291: 'subSecOriginal',
     },
   };
 
@@ -76,9 +79,25 @@
   }
 
   /**
+   * "2024:05:18 21:34:07" (+ "12" de subsegundos) en milisegundos. El EXIF no
+   * guarda la zona horaria: se trata como UTC, que basta para ordenar fotos de
+   * una misma cámara.
+   *
+   * @returns {number|undefined}
+   */
+  function exifDateMs(text, subSec) {
+    const m = /^(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/.exec(text ?? '');
+    if (!m) return undefined;
+    const [year, month, day, hour, minute, second] = m.slice(1).map(Number);
+    if (!year || !month || !day) return undefined; // "0000:00:00 00:00:00"
+    const fraction = /^\d+$/.test(subSec ?? '') ? Number(`0.${subSec}`) : 0;
+    return Date.UTC(year, month - 1, day, hour, minute, second) + Math.round(fraction * 1000);
+  }
+
+  /**
    * @param {ArrayBuffer} buffer inicio del archivo JPEG
-   * @returns {?{make, model, lens, focal, aperture, exposure, iso}} null si no hay
-   *   EXIF legible. Cualquier campo puede faltar.
+   * @returns {?{make, model, lens, focal, aperture, exposure, iso, takenAt}} null
+   *   si no hay EXIF legible. Cualquier campo puede faltar; `takenAt` va en ms.
    */
   function parseExif(buffer) {
     try {
@@ -94,6 +113,10 @@
       readIfd(view, tiff, view.getUint32(tiff + 4, little), little, TAGS.IFD0, data);
       if (data.exifPointer) readIfd(view, tiff, data.exifPointer, little, TAGS.EXIF, data);
       delete data.exifPointer;
+      const takenAt = exifDateMs(data.dateTimeOriginal, data.subSecOriginal);
+      delete data.dateTimeOriginal;
+      delete data.subSecOriginal;
+      if (takenAt !== undefined) data.takenAt = takenAt;
       return data;
     } catch {
       return null; // EXIF truncado o malformado: la foto sigue siendo válida
@@ -127,7 +150,7 @@
     return [gear.join(' · '), exposure.join(' · ')].filter(Boolean).join('\n');
   }
 
-  const api = { parseExif, formatCaption };
+  const api = { parseExif, formatCaption, exifDateMs };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.PaspartuExif = api;
 })(globalThis);

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { parseExif, formatCaption } = require('../js/exif.js');
+const { parseExif, formatCaption, exifDateMs } = require('../js/exif.js');
 
 // JPEG mínimo con APP1 EXIF, en el orden de bytes pedido.
 function jpegWithExif(little) {
@@ -28,16 +28,20 @@ function jpegWithExif(little) {
   entry(34, 0x8769, 4, 1, 60);
   text(200, 'Canon\0');
   text(210, 'Canon EOS R5\0');
-  tiff.setUint16(60, 5, little); // Exif IFD
+  tiff.setUint16(60, 7, little); // Exif IFD
   entry(62, 0x829a, 5, 1, 230);
   entry(74, 0x829d, 5, 1, 238);
   entry(86, 0x8827, 3, 1, 400);
   entry(98, 0x920a, 5, 1, 246);
   entry(110, 0xa434, 2, 15, 260);
+  entry(122, 0x9003, 2, 20, 280);
+  entry(134, 0x9291, 2, 3, 0);
+  text(142, '12\0'); // cabe en la entrada
   rational(230, 1, 250);
   rational(238, 14, 10);
   rational(246, 35, 1);
   text(260, 'RF35mm F1.8 IS\0');
+  text(280, '2024:05:18 21:34:07\0');
 
   const app1 = new Uint8Array(4 + 6 + bytes.length);
   const view = new DataView(app1.buffer);
@@ -62,6 +66,7 @@ for (const little of [true, false]) {
     assert.equal(data.aperture, 1.4);
     assert.equal(data.iso, 400);
     assert.equal(data.focal, 35);
+    assert.equal(data.takenAt, Date.UTC(2024, 4, 18, 21, 34, 7, 120));
   });
 }
 
@@ -98,4 +103,13 @@ test('lee números de coma flotante, como escriben algunos editores', () => {
   view.setUint16(aperture + 2, 12, true);
   view.setFloat64(tiff + 238, 2.8, true);
   assert.equal(parseExif(file.buffer).aperture, 2.8);
+});
+
+test('fecha de captura: subsegundos y fechas vacías', () => {
+  assert.equal(exifDateMs('2024:05:18 21:34:07'), Date.UTC(2024, 4, 18, 21, 34, 7));
+  assert.equal(exifDateMs('2024:05:18 21:34:07', '5'), Date.UTC(2024, 4, 18, 21, 34, 7, 500));
+  assert.equal(exifDateMs('2024:05:18 21:34:07', '045'), Date.UTC(2024, 4, 18, 21, 34, 7, 45));
+  assert.equal(exifDateMs('0000:00:00 00:00:00'), undefined);
+  assert.equal(exifDateMs(''), undefined);
+  assert.equal(exifDateMs(undefined), undefined);
 });

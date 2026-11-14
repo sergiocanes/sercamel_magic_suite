@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Paspartugo</title>
+  <link rel="stylesheet" href="../shared/css/base.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -137,10 +138,9 @@
       <details class="section">
         <summary>Zonas seguras</summary>
         <label class="check"><input type="checkbox" id="zones-on" data-bind="ui.zones"><span>Mostrar guías<small>Solo en pantalla; no se exportan</small></span></label>
-        <div class="segmented three" data-only="carousel">
+        <div class="segmented two" data-only="carousel">
           <label><input type="radio" name="preview" value="feed" data-bind="ui.preview"><span>Feed</span></label>
           <label><input type="radio" name="preview" value="story" data-bind="ui.preview"><span>Story</span></label>
-          <label><input type="radio" name="preview" value="reel" data-bind="ui.preview"><span>Reel</span></label>
         </div>
       </details>
     </div>
@@ -151,23 +151,6 @@
 
       <button type="button" class="primary" id="export" data-only="carousel" disabled>Exportar carrusel</button>
       <button type="button" class="ghost" id="export-multi" data-only="carousel" disabled>Feed + Story + Square</button>
-      <details class="section reel" data-only="carousel">
-        <summary>Motion Reel</summary>
-        <label class="field inline"><span>Foto</span><select id="reel-photo"></select></label>
-        <label class="field inline"><span>Movimiento</span>
-          <select id="reel-motion" data-bind="reel.motion">
-            <option value="zoom-in">Acercar</option>
-            <option value="zoom-out">Alejar</option>
-            <option value="pan-right">Paneo a la derecha</option>
-            <option value="pan-left">Paneo a la izquierda</option>
-            <option value="pan-down">Paneo hacia abajo</option>
-            <option value="pan-up">Paneo hacia arriba</option>
-          </select>
-        </label>
-        <label class="field"><span>Duración</span><output data-out="reel.seconds" data-unit=" s"></output>
-          <input type="range" id="reel-seconds" min="5" max="10" data-bind="reel.seconds"></label>
-        <button type="button" class="ghost" id="export-reel" disabled>Generar vídeo</button>
-      </details>
 
       <button type="button" class="primary" id="export-panorama" data-only="panorama" disabled>Exportar paneles</button>
       <button type="button" class="ghost" id="clear" hidden>Vaciar</button>
@@ -251,21 +234,18 @@
   <input type="file" id="grid-input" accept="image/*" multiple hidden>
   <div class="toast" id="toast" role="status" hidden></div>
 
-  <script src="js/random.js"></script>
-  <script src="js/layout.js"></script>
+  <script src="../shared/js/random.js"></script>
+  <script src="../shared/js/layout.js"></script>
   <script src="js/panorama.js"></script>
-  <script src="js/exif.js"></script>
+  <script src="../shared/js/exif.js"></script>
   <script src="js/palette.js"></script>
   <script src="js/texture.js"></script>
-  <script src="js/safezones.js"></script>
+  <script src="../shared/js/safezones.js"></script>
   <script src="js/presets.js"></script>
-  <script src="js/zip.js"></script>
-  <script src="js/mp4.js"></script>
-  <script src="js/kenburns.js"></script>
+  <script src="../shared/js/zip.js"></script>
   <script src="js/compositor.js"></script>
   <script src="js/exporters.js"></script>
-  <script src="js/reel.js"></script>
-  <script src="js/dom.js"></script>
+  <script src="../shared/js/dom.js"></script>
   <script src="js/grid.js"></script>
   <script src="js/app.js"></script>
 </body>

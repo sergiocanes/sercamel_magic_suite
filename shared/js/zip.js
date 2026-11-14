@@ -19,7 +19,14 @@
     };
   }
 
-  // files: [{ name, bytes: Uint8Array }]. Devuelve la lista de trozos del ZIP.
+  const MAX_ZIP_BYTES = 0xffffffff; // sin ZIP64, los desplazamientos son de 32 bits
+
+  /**
+   * @param {({name: string, bytes: Uint8Array} | {name: string, data: Blob, size: number, crc: number})[]} files
+   *   el contenido va en `bytes` o, ya medido, en un `data` que no hace falta
+   *   tener en memoria (un fotograma de vídeo, por ejemplo).
+   * @returns {(Uint8Array|Blob)[]} trozos del ZIP, para `new Blob(parts)`
+   */
   function zipParts(files, now = new Date()) {
     const { time, date } = dosDateTime(now);
     const encoder = new TextEncoder();
@@ -27,9 +34,11 @@
     const central = [];
     let offset = 0;
 
-    for (const { name, bytes } of files) {
+    for (const file of files) {
+      const { name } = file;
       const nameBytes = encoder.encode(name);
-      const crc = crc32(bytes);
+      const size = file.bytes ? file.bytes.length : file.size;
+      const crc = file.bytes ? crc32(file.bytes) : file.crc;
 
       // Campos comunes a la cabecera local y a la central, desde "version needed".
       const common = new DataView(new ArrayBuffer(26));
@@ -39,8 +48,8 @@
       common.setUint16(6, time, true);
       common.setUint16(8, date, true);
       common.setUint32(10, crc, true);
-      common.setUint32(14, bytes.length, true);
-      common.setUint32(18, bytes.length, true);
+      common.setUint32(14, size, true);
+      common.setUint32(18, size, true);
       common.setUint16(22, nameBytes.length, true);
       common.setUint16(24, 0, true);
       const commonBytes = new Uint8Array(common.buffer);
@@ -49,7 +58,7 @@
       new DataView(local.buffer).setUint32(0, 0x04034b50, true);
       local.set(commonBytes, 4);
       local.set(nameBytes, 30);
-      parts.push(local, bytes);
+      parts.push(local, file.bytes ?? file.data);
 
       const entry = new Uint8Array(46 + nameBytes.length);
       const entryView = new DataView(entry.buffer);
@@ -60,7 +69,8 @@
       entry.set(nameBytes, 46);
       central.push(entry);
 
-      offset += local.length + bytes.length;
+      offset += local.length + size;
+      if (offset > MAX_ZIP_BYTES) throw new Error('El ZIP supera los 4 GB');
     }
 
     const centralSize = central.reduce((sum, e) => sum + e.length, 0);
@@ -74,7 +84,7 @@
     return [...parts, ...central, new Uint8Array(end.buffer)];
   }
 
-  const api = { crc32, zipParts };
+  const api = { crc32, zipParts, MAX_ZIP_BYTES };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.PaspartuZip = api;
 })(globalThis);

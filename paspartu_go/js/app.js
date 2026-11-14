@@ -25,7 +25,6 @@
     s: Presets.resolve(),
     ui: { tab: 'carousel', preview: 'feed', zones: false, paletteTarget: 'background' },
     pano: { format: '4:5', panels: 3, marginOrder: 'before', fit: 'cover' },
-    reel: { seconds: 6, motion: 'zoom-in' },
   };
 
   let photos = []; // { id, name, file, w, h, thumb, samples, caption }
@@ -241,7 +240,6 @@
     });
     $('slides').replaceChildren(...items);
     renderPalette();
-    renderReelOptions();
     updateChrome();
     if (model.ui.tab === 'grid') grid.render();
   }
@@ -382,20 +380,6 @@
     toast(`Preset guardado: ${name}`);
   }
 
-  // ---- Reel ---------------------------------------------------------------
-
-  function renderReelOptions() {
-    const select = $('reel-photo');
-    const current = select.value;
-    select.replaceChildren(...photos.map((photo, index) => {
-      const option = document.createElement('option');
-      option.value = photo.id;
-      option.textContent = `${String(index + 1).padStart(2, '0')} · ${photo.name}`;
-      return option;
-    }));
-    if (photos.some((p) => String(p.id) === current)) select.value = current;
-  }
-
   // ---- Repintado y estado de la interfaz ----------------------------------
 
   function repaint() {
@@ -481,14 +465,12 @@
 
     $('export').disabled = !has || blocked;
     $('export-multi').disabled = !has || blocked;
-    $('export-reel').disabled = !has || blocked;
     $('export-panorama').disabled = !panorama || blocked;
 
     if (!busy) {
       const noun = photos.length === 1 ? 'imagen' : 'imágenes';
       $('export').textContent = has ? `Exportar ${photos.length} ${noun}` : 'Exportar carrusel';
       $('export-multi').textContent = 'Feed + Story + Square';
-      $('export-reel').textContent = 'Generar vídeo';
       $('export-panorama').textContent = panorama ? `Exportar ${model.pano.panels} paneles` : 'Exportar paneles';
     }
     const loading = pendingImports > 0 ? ` · cargando ${pendingImports}…` : '';
@@ -583,21 +565,6 @@
     });
     download(result);
     toast(`Panorámica lista: ${model.pano.panels} paneles`);
-  }));
-
-  $('export-reel').addEventListener('click', () => runTask($('export-reel'), async (report) => {
-    const photo = photos.find((p) => String(p.id) === $('reel-photo').value) ?? photos[0];
-    const result = await PaspartuReel.renderReel({
-      photo,
-      settings: model.s,
-      seconds: model.reel.seconds,
-      motion: model.reel.motion,
-      onProgress: (done, total) => report(`Generando ${Math.round((done / total) * 100)} %…`),
-    });
-    download(result);
-    toast(result.isMp4
-      ? 'Reel listo en MP4'
-      : 'Este navegador solo genera WebM. Instagram pide MP4: conviértelo o usa otro navegador.');
   }));
 
   // ---- Eventos ------------------------------------------------------------

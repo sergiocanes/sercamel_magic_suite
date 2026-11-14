@@ -1,7 +1,7 @@
 // Colores dominantes por k-means en espacio Lab, que agrupa como percibe el ojo.
 (function (root) {
   const { mulberry32 } = typeof module === 'object' && module.exports
-    ? require('./random.js')
+    ? require('../../shared/js/random.js')
     : root.PaspartuRandom;
 
   const ITERATIONS = 12;

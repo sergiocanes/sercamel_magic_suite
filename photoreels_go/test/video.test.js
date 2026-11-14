@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { muxMp4 } = require('../js/mp4.js');
-const { MOTIONS, MAX_ZOOM, viewAt } = require('../js/kenburns.js');
+const { MOTIONS, DEFAULT_ZOOM, viewAt } = require('../js/kenburns.js');
 
 function topLevelBoxes(bytes) {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -31,6 +31,10 @@ test('el MP4 lleva el índice antes que los datos y apunta a la primera muestra'
   assert.equal(file[offset], 1);
   assert.equal(file.indexOf('ctts'), -1); // sin fotogramas B no hace falta
   assert.equal(file.indexOf('edts'), -1);
+
+  const colr = file.indexOf('colrnclx');
+  assert.ok(colr > file.indexOf('avcC'));
+  assert.equal(file.subarray(colr + 8, colr + 15).toString('hex'), '00010001000100'); // BT.709, rango limitado
 });
 
 test('con fotogramas B guarda el desfase de cada fotograma y compensa el retraso', () => {
@@ -89,7 +93,7 @@ for (const motion of MOTIONS) {
 
 test('acercar empieza con la foto entera y termina en el zoom máximo', () => {
   assert.deepEqual(viewAt(0, 'zoom-in', 1000, 800), { x: 0, y: 0, w: 1000, h: 800 });
-  assert.ok(Math.abs(viewAt(1, 'zoom-in', 1000, 800).w - 1000 / MAX_ZOOM) < 1e-9);
+  assert.ok(Math.abs(viewAt(1, 'zoom-in', 1000, 800).w - 1000 / DEFAULT_ZOOM) < 1e-9);
 });
 
 test('el paneo a la derecha avanza sin cambiar el encuadre', () => {
@@ -98,4 +102,15 @@ test('el paneo a la derecha avanza sin cambiar el encuadre', () => {
   assert.ok(end.x > start.x);
   assert.equal(end.w, start.w);
   assert.equal(end.y, start.y);
+});
+
+test('el zoom se puede ajustar y el avance es lineal', () => {
+  assert.ok(Math.abs(viewAt(1, 'zoom-in', 1000, 800, 1.1).w - 1000 / 1.1) < 1e-9);
+  const half = viewAt(0.5, 'zoom-in', 1000, 800, 1.1);
+  assert.ok(Math.abs(half.w - 1000 / 1.05) < 1e-9);
+});
+
+test('fuera de 0 a 1 se queda en el extremo', () => {
+  assert.deepEqual(viewAt(-0.2, 'zoom-in', 1000, 800), viewAt(0, 'zoom-in', 1000, 800));
+  assert.deepEqual(viewAt(1.3, 'zoom-in', 1000, 800), viewAt(1, 'zoom-in', 1000, 800));
 });

@@ -5,7 +5,7 @@
 // color: un modo de fusión como "overlay" no tendría efecto sobre blanco puro.
 (function (root) {
   const { mulberry32 } = typeof module === 'object' && module.exports
-    ? require('./random.js')
+    ? require('../../shared/js/random.js')
     : root.PaspartuRandom;
 
   const TILE_SIZE = 512;

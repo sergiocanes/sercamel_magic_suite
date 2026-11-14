@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { FORMATS } = require('../js/layout.js');
+const { FORMATS } = require('../../shared/js/layout.js');
 const { suggestPanels, planPanorama } = require('../js/panorama.js');
 
 const F45 = FORMATS['4:5'];

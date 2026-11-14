@@ -3,6 +3,10 @@
 // Los navegadores codifican H.264 con WebCodecs pero no lo guardan en un archivo.
 // El índice (moov) va delante de los datos para que el vídeo empiece a
 // reproducirse sin leerlo entero.
+//
+// El color se declara BT.709 de rango limitado, el estándar del vídeo HD. Sin esa
+// etiqueta cada editor supone uno distinto y los negros se ven lavados en unos y
+// empastados en otros.
 (function (root) {
   const u32 = (v) => { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, v); return b; };
   const u16 = (v) => { const b = new Uint8Array(2); new DataView(b.buffer).setUint16(0, v); return b; };
@@ -70,7 +74,9 @@
       zeros(4), u16(1), // un fotograma por muestra
       zeros(32), // nombre del compresor
       u16(0x18), u16(0xffff),
-      box('avcC', avcC));
+      box('avcC', avcC),
+      // nclx: primarios, transferencia y matriz BT.709 (1); rango limitado (0).
+      box('colr', ascii('nclx'), u16(1), u16(1), u16(1), Uint8Array.of(0)));
   }
 
   // Con fotogramas B el orden de decodificación no es el de presentación. Un
@@ -118,7 +124,7 @@
         editBox(video, shift, duration),
         box('mdia',
           fullBox('mdhd', 0, zeros(8), u32(timescale), u32(duration), u16(0x55c4), zeros(2)),
-          fullBox('hdlr', 0, zeros(4), ascii('vide'), zeros(12), ascii('Paspartugo'), zeros(1)),
+          fullBox('hdlr', 0, zeros(4), ascii('vide'), zeros(12), ascii('PhotoReelsGo'), zeros(1)),
           box('minf',
             fullBox('vmhd', 1, zeros(8)),
             box('dinf', fullBox('dref', 0, u32(1), fullBox('url ', 1))),
@@ -147,5 +153,5 @@
 
   const api = { muxMp4 };
   if (typeof module === 'object' && module.exports) module.exports = api;
-  else root.PaspartuMp4 = api;
+  else root.PhotoReelsMp4 = api;
 })(globalThis);
