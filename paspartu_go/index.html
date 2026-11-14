@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paspartugo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="panel">
+    <header class="brand">
+      <h1>Paspartugo</h1>
+      <p>Carruseles de Instagram con paspartú</p>
+    </header>
+
+    <div class="controls">
+      <details class="section" open>
+        <summary>Paspartú</summary>
+        <fieldset class="group" data-only="carousel">
+          <legend>Formato</legend>
+          <div class="segmented">
+            <label><input type="radio" name="format" value="auto" data-bind="s.format"><span>Auto</span></label>
+            <label><input type="radio" name="format" value="4:5" data-bind="s.format"><span>4:5</span></label>
+            <label><input type="radio" name="format" value="3:4" data-bind="s.format"><span>3:4</span></label>
+            <label><input type="radio" name="format" value="1:1" data-bind="s.format"><span>1:1</span></label>
+          </div>
+          <p class="note" id="format-note"></p>
+        </fieldset>
+
+        <label class="field">
+          <span>Margen mínimo</span><output data-out="s.marginPct" data-unit=" %"></output>
+          <input type="range" id="margin" min="0" max="20" step="0.5" data-bind="s.marginPct">
+        </label>
+
+        <fieldset class="group">
+          <legend>Color de fondo</legend>
+          <div class="swatches">
+            <label title="Blanco"><input type="radio" name="color" value="#ffffff" data-bind="s.color" aria-label="Blanco"><span style="background:#ffffff"></span></label>
+            <label title="Papel"><input type="radio" name="color" value="#f3eee4" data-bind="s.color" aria-label="Papel"><span style="background:#f3eee4"></span></label>
+            <label title="Gris"><input type="radio" name="color" value="#8c8b87" data-bind="s.color" aria-label="Gris"><span style="background:#8c8b87"></span></label>
+            <label title="Negro"><input type="radio" name="color" value="#101010" data-bind="s.color" aria-label="Negro"><span style="background:#101010"></span></label>
+            <input type="color" id="custom-color" data-bind="s.color" title="Color personalizado" aria-label="Color personalizado">
+          </div>
+        </fieldset>
+
+        <fieldset class="group" id="palette-group" hidden>
+          <legend>Paleta de tus fotos</legend>
+          <div class="palette" id="palette"></div>
+          <div class="segmented two">
+            <label><input type="radio" name="palette-target" value="background" data-bind="ui.paletteTarget"><span>Aplicar al fondo</span></label>
+            <label><input type="radio" name="palette-target" value="border" data-bind="ui.paletteTarget"><span>Aplicar al borde</span></label>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span>Borde de la foto</span><output data-out="s.border.width" data-unit=" px"></output>
+          <input type="range" min="0" max="30" step="1" data-bind="s.border.width">
+        </label>
+        <label class="field inline">
+          <span>Color del borde</span>
+          <input type="color" data-bind="s.border.color">
+        </label>
+
+        <label class="check">
+          <input type="checkbox" id="optical" data-bind="s.optical">
+          <span>Centrado óptico<small>Sube un poco la foto, como en un marco clásico</small></span>
+        </label>
+      </details>
+
+      <details class="section">
+        <summary>Sombra</summary>
+        <label class="check"><input type="checkbox" id="shadow-on" data-bind="s.shadow.enabled"><span>Activar sombra</span></label>
+        <label class="field"><span>Desenfoque</span><output data-out="s.shadow.blur" data-unit=" px"></output>
+          <input type="range" min="0" max="120" data-bind="s.shadow.blur"></label>
+        <label class="field"><span>Desplazamiento X</span><output data-out="s.shadow.offsetX" data-unit=" px"></output>
+          <input type="range" min="-60" max="60" data-bind="s.shadow.offsetX"></label>
+        <label class="field"><span>Desplazamiento Y</span><output data-out="s.shadow.offsetY" data-unit=" px"></output>
+          <input type="range" min="-60" max="60" data-bind="s.shadow.offsetY"></label>
+        <label class="field"><span>Opacidad</span><output data-out="s.shadow.opacity" data-unit=" %"></output>
+          <input type="range" min="0" max="100" data-bind="s.shadow.opacity"></label>
+        <label class="field inline"><span>Color</span><input type="color" data-bind="s.shadow.color"></label>
+      </details>
+
+      <details class="section">
+        <summary>Textura</summary>
+        <label class="field inline"><span>Tipo</span>
+          <select id="texture-preset" data-bind="s.texture.preset">
+            <option value="none">Sin textura</option>
+            <option value="film">Grano de película</option>
+            <option value="paper">Papel mate</option>
+            <option value="canvas">Lienzo</option>
+            <option value="noise">Ruido sintético</option>
+          </select>
+        </label>
+        <label class="field"><span>Intensidad</span><output data-out="s.texture.intensity" data-unit=" %"></output>
+          <input type="range" min="20" max="200" step="10" data-bind="s.texture.intensity"></label>
+        <label class="field"><span>Escala</span><output data-out="s.texture.scale" data-unit="×"></output>
+          <input type="range" min="1" max="4" step="0.5" data-bind="s.texture.scale"></label>
+        <label class="field"><span>Opacidad</span><output data-out="s.texture.opacity" data-unit=" %"></output>
+          <input type="range" min="0" max="100" data-bind="s.texture.opacity"></label>
+      </details>
+
+      <details class="section">
+        <summary>Datos EXIF</summary>
+        <label class="check"><input type="checkbox" id="exif-on" data-bind="s.exif.enabled"><span>Mostrar en el margen<small>El texto se edita bajo cada imagen</small></span></label>
+        <fieldset class="group">
+          <legend>Posición</legend>
+          <div class="segmented three">
+            <label><input type="radio" name="exif-position" value="left" data-bind="s.exif.position"><span>Izquierda</span></label>
+            <label><input type="radio" name="exif-position" value="center" data-bind="s.exif.position"><span>Centro</span></label>
+            <label><input type="radio" name="exif-position" value="right" data-bind="s.exif.position"><span>Derecha</span></label>
+          </div>
+        </fieldset>
+        <label class="field inline"><span>Tipografía</span>
+          <select data-bind="s.exif.font">
+            <option value="sans">Sans</option>
+            <option value="serif">Serif</option>
+            <option value="mono">Mono</option>
+          </select>
+        </label>
+        <label class="field"><span>Tamaño</span><output data-out="s.exif.size" data-unit=" px"></output>
+          <input type="range" min="14" max="36" data-bind="s.exif.size"></label>
+      </details>
+
+      <details class="section">
+        <summary>Presets</summary>
+        <label class="field inline"><span>Cargar</span>
+          <select id="preset-list"></select>
+        </label>
+        <div class="preset-save">
+          <input type="text" id="preset-name" placeholder="Nombre del preset" maxlength="40" aria-label="Nombre del preset">
+          <button type="button" class="ghost small" id="preset-save">Guardar</button>
+        </div>
+        <button type="button" class="ghost small" id="preset-delete" hidden>Borrar preset</button>
+      </details>
+
+      <details class="section">
+        <summary>Zonas seguras</summary>
+        <label class="check"><input type="checkbox" id="zones-on" data-bind="ui.zones"><span>Mostrar guías<small>Solo en pantalla; no se exportan</small></span></label>
+        <div class="segmented three" data-only="carousel">
+          <label><input type="radio" name="preview" value="feed" data-bind="ui.preview"><span>Feed</span></label>
+          <label><input type="radio" name="preview" value="story" data-bind="ui.preview"><span>Story</span></label>
+          <label><input type="radio" name="preview" value="reel" data-bind="ui.preview"><span>Reel</span></label>
+        </div>
+      </details>
+    </div>
+
+    <div class="actions">
+      <p class="note warn" id="grid-note" hidden></p>
+      <p class="note warn" id="count-note" hidden></p>
+
+      <button type="button" class="primary" id="export" data-only="carousel" disabled>Exportar carrusel</button>
+      <button type="button" class="ghost" id="export-multi" data-only="carousel" disabled>Feed + Story + Square</button>
+      <details class="section reel" data-only="carousel">
+        <summary>Motion Reel</summary>
+        <label class="field inline"><span>Foto</span><select id="reel-photo"></select></label>
+        <label class="field inline"><span>Movimiento</span>
+          <select id="reel-motion" data-bind="reel.motion">
+            <option value="zoom-in">Acercar</option>
+            <option value="zoom-out">Alejar</option>
+            <option value="pan-right">Paneo a la derecha</option>
+            <option value="pan-left">Paneo a la izquierda</option>
+            <option value="pan-down">Paneo hacia abajo</option>
+            <option value="pan-up">Paneo hacia arriba</option>
+          </select>
+        </label>
+        <label class="field"><span>Duración</span><output data-out="reel.seconds" data-unit=" s"></output>
+          <input type="range" id="reel-seconds" min="5" max="10" data-bind="reel.seconds"></label>
+        <button type="button" class="ghost" id="export-reel" disabled>Generar vídeo</button>
+      </details>
+
+      <button type="button" class="primary" id="export-panorama" data-only="panorama" disabled>Exportar paneles</button>
+      <button type="button" class="ghost" id="clear" hidden>Vaciar</button>
+    </div>
+  </aside>
+
+  <main class="stage" id="stage">
+    <nav class="tabs" role="tablist" aria-label="Vistas">
+      <button type="button" role="tab" data-tab="carousel">Carrusel</button>
+      <button type="button" role="tab" data-tab="panorama">Panorámica</button>
+      <button type="button" role="tab" data-tab="grid">Grilla</button>
+    </nav>
+
+    <section data-view="carousel">
+      <div class="toolbar" id="toolbar" hidden>
+        <span id="summary"></span>
+        <button type="button" class="ghost" id="add-more">Añadir fotos</button>
+      </div>
+      <button type="button" class="dropzone" id="dropzone">
+        <strong>Arrastra aquí tus fotos</strong>
+        <span>o haz clic para elegirlas · JPG, PNG o WebP</span>
+      </button>
+      <ol class="slides" id="slides" hidden></ol>
+    </section>
+
+    <section data-view="panorama" hidden>
+      <button type="button" class="dropzone" id="pano-dropzone">
+        <strong>Arrastra aquí tu panorámica</strong>
+        <span>Se divide en paneles contiguos para un carrusel continuo</span>
+      </button>
+      <div id="pano-editor" hidden>
+        <div class="pano-options">
+          <label class="field"><span>Paneles</span><output data-out="pano.panels"></output>
+            <input type="range" id="pano-panels" min="2" max="10" data-bind="pano.panels"></label>
+          <fieldset class="group">
+            <legend>Formato</legend>
+            <div class="segmented two">
+              <label><input type="radio" name="pano-format" value="4:5" data-bind="pano.format"><span>4:5</span></label>
+              <label><input type="radio" name="pano-format" value="1:1" data-bind="pano.format"><span>1:1</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="group">
+            <legend>Paspartú</legend>
+            <div class="segmented two">
+              <label title="Rodea la panorámica entera; la imagen es continua entre slides"><input type="radio" name="pano-order" value="before" data-bind="pano.marginOrder"><span>Antes de dividir</span></label>
+              <label title="Cada panel lleva su propio marco"><input type="radio" name="pano-order" value="after" data-bind="pano.marginOrder"><span>Después</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="group">
+            <legend>Ajuste</legend>
+            <div class="segmented two">
+              <label><input type="radio" name="pano-fit" value="cover" data-bind="pano.fit"><span>Rellenar</span></label>
+              <label><input type="radio" name="pano-fit" value="contain" data-bind="pano.fit"><span>Encajar</span></label>
+            </div>
+          </fieldset>
+        </div>
+        <p class="note" id="pano-note"></p>
+        <div class="panels" id="panels"></div>
+        <textarea class="pano-caption" id="pano-caption" rows="2" placeholder="Equipo&#10;Ajustes" aria-label="Datos de la panorámica" hidden></textarea>
+        <button type="button" class="ghost" id="pano-change">Cambiar imagen</button>
+      </div>
+    </section>
+
+    <section data-view="grid" hidden>
+      <div class="toolbar">
+        <span>Tu portada entre tus publicaciones. Arrastra para probar el orden.</span>
+        <button type="button" class="ghost" id="grid-add">Cargar publicaciones</button>
+      </div>
+      <div class="profile">
+        <header class="profile-head">
+          <span class="avatar"></span>
+          <span class="profile-lines"><i></i><i></i></span>
+        </header>
+        <ol class="grid" id="grid"></ol>
+      </div>
+    </section>
+  </main>
+
+  <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple hidden>
+  <input type="file" id="pano-input" accept="image/jpeg,image/png,image/webp" hidden>
+  <input type="file" id="grid-input" accept="image/*" multiple hidden>
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="js/random.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/panorama.js"></script>
+  <script src="js/exif.js"></script>
+  <script src="js/palette.js"></script>
+  <script src="js/texture.js"></script>
+  <script src="js/safezones.js"></script>
+  <script src="js/presets.js"></script>
+  <script src="js/zip.js"></script>
+  <script src="js/mp4.js"></script>
+  <script src="js/kenburns.js"></script>
+  <script src="js/compositor.js"></script>
+  <script src="js/exporters.js"></script>
+  <script src="js/reel.js"></script>
+  <script src="js/dom.js"></script>
+  <script src="js/grid.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
