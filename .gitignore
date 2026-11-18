@@ -1,0 +1,33 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (por si se añaden herramientas)
+node_modules/
+npm-debug.log*
+
+# Skills de agentes instaladas con `npx skills add` (se reinstalan desde skills-lock.json)
+.agents/
+.claude/
+
+# Artefactos de taste-skill y capturas
+.taste-skill/
+shots/
+.shots/
+
+# Exportaciones locales de las apps
+*.zip
+*.mp4
+exports/
+
+# Variables de entorno
+.env
+.env.*
